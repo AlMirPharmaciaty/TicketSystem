@@ -39,7 +39,7 @@ users:
 - username
 - email
 - password
-- created_on
-- updated_on
+- created_at
+- updated_at
 - deleted
 - roles
