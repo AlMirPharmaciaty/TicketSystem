@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from ..utils.database import get_db
-from ..schemas.user import UserDetails, UserUpdate, UserDetailsExtend
+from ..schemas.user import UserDetails, UserUpdate
 from ..controllers.user import update_user, delete_user, get_user
 from ..models.user import User
 from ..controllers.auth import get_current_user
@@ -9,7 +9,7 @@ from ..controllers.auth import get_current_user
 users = APIRouter(prefix="/user", tags=["User"])
 
 
-@users.get("/", response_model=list[UserDetailsExtend])
+@users.get("/", response_model=list[UserDetails])
 def users_get_all(
     db: Session = Depends(get_db),
     user_id: int = None,

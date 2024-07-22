@@ -7,7 +7,7 @@ USER = "postgres"
 PASSWORD = "123"
 HOST = "192.168.12.35"
 POST = 5432
-DATABASE = "postgres"
+DATABASE = "ticketsdb"
 DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{POST}/{DATABASE}"
 
 engine = create_engine(DATABASE_URL)
