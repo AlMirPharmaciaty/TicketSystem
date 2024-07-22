@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from ..utils.database import get_db
 from ..schemas.auth import Token
 from ..controllers.auth import authenticate_user, create_access_token
-from ..controllers.user import create_user
+# from ..controllers.user import create_user
 from ..schemas.user import UserDetails, UserCreate
 
 auth = APIRouter(prefix="/auth", tags=["Auth"])
@@ -26,6 +26,6 @@ def login(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@auth.post("/register/", response_model=UserDetails)
-def register(user: UserCreate, db: Session = Depends(get_db)):
-    return create_user(db=db, user=user)
+# @auth.post("/register/", response_model=UserDetails)
+# def register(user: UserCreate, db: Session = Depends(get_db)):
+#     return create_user(db=db, user=user)
