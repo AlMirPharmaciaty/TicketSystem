@@ -15,7 +15,10 @@ def note_get(
     db: Session = Depends(get_db),
     user: User = Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
 ):
-    return get_notes(ticket_id=ticket_id, db=db, user=user)
+    if "Customer" in user.roles:
+        return get_notes(ticket_id=ticket_id, db=db, user=user)
+    else:
+        return get_notes(ticket_id=ticket_id, db=db)
 
 
 @ticket_notes.post("/", response_model=TicketNoteDetails)
