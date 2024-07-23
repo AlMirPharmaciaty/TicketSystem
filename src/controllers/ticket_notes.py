@@ -6,6 +6,16 @@ from src.models.user import User
 from src.schemas.ticket_notes import TicketNoteCreate
 
 
+def get_notes(ticket_id: int, db: Session):
+    notes = (
+        db.query(TicketNote)
+        .filter(TicketNote.ticket_id == ticket_id)
+        .order_by(TicketNote.created_at.desc())
+        .all()
+    )
+    return notes
+
+
 def create_note(note: TicketNoteCreate, db: Session, user: User):
     ticket = (
         db.query(Ticket)
