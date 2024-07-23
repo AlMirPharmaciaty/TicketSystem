@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ARRAY
 from sqlalchemy.sql import func
-from ..utils.database import Base
+from src.utils.database import Base
 
 func: callable
 

@@ -13,7 +13,6 @@ tickets:
 - description
 - status [new, acknowledged, in-progress, completed, cancelled, rejected]
 - created_at
-- created_by
 - user_id
 - username
 
@@ -30,7 +29,6 @@ ticketNotes:
 - ticket_id (fk)
 - note
 - created_at
-- modified_at
 - user_id
 - username
 
@@ -39,7 +37,7 @@ users:
 - username
 - email
 - password
-- created_on
-- updated_on
+- created_at
+- updated_at
 - deleted
 - roles

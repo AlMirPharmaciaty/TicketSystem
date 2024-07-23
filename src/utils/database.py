@@ -1,14 +1,9 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# DEFINE THE DATABASE CREDENTIALS
-USER = "postgres"
-PASSWORD = "123"
-HOST = "192.168.12.35"
-POST = 5432
-DATABASE = "postgres"
-DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{POST}/{DATABASE}"
+DATABASE_URL = os.getenv("DB_URL")
 
 engine = create_engine(DATABASE_URL)
 session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
