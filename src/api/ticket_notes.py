@@ -15,16 +15,13 @@ def note_get(
     db: Session = Depends(get_db),
     user: User = Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
 ):
-    if "Customer" in user.roles:
-        return get_notes(ticket_id=ticket_id, db=db, user=user)
-    else:
-        return get_notes(ticket_id=ticket_id, db=db)
+    return get_notes(ticket_id=ticket_id, db=db, user=user)
 
 
 @ticket_notes.post("/", response_model=TicketNoteDetails)
 def note_create(
     note: TicketNoteCreate,
     db: Session = Depends(get_db),
-    user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
+    user: User = Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
 ):
     return create_note(note=note, db=db, user=user)

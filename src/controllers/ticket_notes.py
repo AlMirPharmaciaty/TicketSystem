@@ -6,8 +6,8 @@ from src.models.user import User
 from src.schemas.ticket_notes import TicketNoteCreate
 
 
-def get_notes(ticket_id: int, db: Session, user: User | None):
-    if user:
+def get_notes(ticket_id: int, db: Session, user: User):
+    if "Pharmacist" not in user.roles:
         ticket = (
             db.query(Ticket)
             .filter(Ticket.id == ticket_id, Ticket.user_id == str(user.id))
@@ -15,9 +15,7 @@ def get_notes(ticket_id: int, db: Session, user: User | None):
         )
 
         if not ticket:
-            raise HTTPException(
-                status_code=401, detail="You can only see your tickets' notes."
-            )
+            raise HTTPException(status_code=400, detail="Ticket not found.")
 
     notes = (
         db.query(TicketNote)
@@ -29,17 +27,14 @@ def get_notes(ticket_id: int, db: Session, user: User | None):
 
 
 def create_note(note: TicketNoteCreate, db: Session, user: User):
-    ticket = (
-        db.query(Ticket)
-        .filter(
-            Ticket.id == note.ticket_id,
-            Ticket.user_id == str(user.id),
-            Ticket.status not in ["Completed", "Cancelled", "Rejected"],
-        )
-        .first()
-    )
+    ticket = db.query(Ticket).filter(Ticket.id == note.ticket_id)
+    ticket = ticket.filter(Ticket.status not in ["Completed", "Cancelled", "Rejected"])
+    if "Pharmacist" not in user.roles:
+        ticket = ticket.filter(Ticket.user_id == str(user.id))
+    ticket = ticket.first()
     if not ticket:
         raise HTTPException(status_code=400, detail="Ticket not found.")
+
     note = TicketNote(**note.model_dump(), user_id=user.id, username=user.username)
     db.add(note)
     db.commit()
