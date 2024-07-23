@@ -12,15 +12,6 @@ from src.schemas.ticket_status import TicketStatus
 tickets = APIRouter(prefix="/tickets", tags=["Tickets"])
 
 
-@tickets.post("/", response_model=TicketDetails)
-async def ticket_create(
-    ticket: TicketCreate,
-    db: Session = Depends(get_db),
-    user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
-):
-    return create_ticket(ticket=ticket, user=user, db=db)
-
-
 @tickets.get("/", response_model=list[TicketDetails])
 async def ticket_get(
     user_id: str | None = None,
@@ -40,6 +31,15 @@ async def ticket_get(
         limit=limit,
         order=order,
     )
+
+
+@tickets.post("/", response_model=TicketDetails)
+async def ticket_create(
+    ticket: TicketCreate,
+    db: Session = Depends(get_db),
+    user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
+):
+    return create_ticket(ticket=ticket, user=user, db=db)
 
 
 @tickets.put("/", response_model=TicketDetails)

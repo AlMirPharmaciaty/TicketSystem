@@ -16,7 +16,7 @@ def users_get_all(
     username: str = None,
     skip: int = 0,
     limit: int = 10,
-    _=Depends(RoleChecker(allowed_roles=["Pharmacist"])),
+    _=Depends(RoleChecker(allowed_roles=["Pharmacist", "Admin"])),
 ):
     return get_user(db=db, user_id=user_id, username=username, skip=skip, limit=limit)
 
