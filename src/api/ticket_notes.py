@@ -15,4 +15,4 @@ def note_create(
     db: Session = Depends(get_db),
     user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
 ):
-    return create_note(note=note, db=db, author_id=user.id)
+    return create_note(note=note, db=db, user=user)

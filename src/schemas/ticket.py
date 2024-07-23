@@ -1,18 +1,19 @@
 from pydantic import BaseModel
 from datetime import datetime
-from src.schemas.ticket_status import TicketStatus
 
-class Ticket(BaseModel):
-    id: int
+
+class TicketBase(BaseModel):
     title: str
     description: str
-    created_at: datetime
 
-class TicketDetails(Ticket):
-    status: TicketStatus
+
+class TicketDetails(TicketBase):
+    id: int
+    status: str
     user_id: str
     username: str
+    created_at: datetime
 
-class TicketCreate(BaseModel):
-    title: str
-    description: str
+
+class TicketCreate(TicketBase):
+    pass

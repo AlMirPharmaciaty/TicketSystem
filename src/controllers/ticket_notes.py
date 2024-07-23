@@ -7,9 +7,13 @@ from src.schemas.ticket_notes import TicketNoteCreate
 
 
 def create_note(note: TicketNoteCreate, db: Session, user: User):
-    ticket = db.query(Ticket).filter(
-        Ticket.id == note.ticket_id,
-        Ticket.status not in ["Completed", "Cancelled", "Rejected"],
+    ticket = (
+        db.query(Ticket)
+        .filter(
+            Ticket.id == note.ticket_id,
+            Ticket.status not in ["Completed", "Cancelled", "Rejected"],
+        )
+        .first()
     )
     if not ticket:
         raise HTTPException(status_code=400, detail="Ticket not found.")
