@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-from src.schemas.ticketStatus import TicketStatus
+from src.schemas.ticket_status import TicketStatus
+
 
 class Ticket(BaseModel):
     id: int
@@ -14,6 +15,13 @@ class TicketDetails(Ticket):
     user_id: str
     username: str
 
-class TicketCreate(BaseModel):
-    title: str
-    description: str
+class TicketCreate(TicketBase):
+    pass
+
+class TicketUpdate(BaseModel):
+    status: TicketStatus
+
+
+class TicketOrder(str, Enum):
+    OLD = "Oldest"
+    LAT = "Latest"
