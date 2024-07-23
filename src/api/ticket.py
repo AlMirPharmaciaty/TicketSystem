@@ -23,6 +23,9 @@ async def ticket_create(
 async def ticket_get_my(
     db: Session = Depends(get_db),
     user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
+    skip: int = 0,
+    limit: int = 10,
+    order: TicketOrder = TicketOrder.LAT,
 ):
     return get_user_tickets(db=db, user=user)
 

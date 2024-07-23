@@ -13,9 +13,9 @@ ticket_notes = APIRouter(prefix="/notes", tags=["Ticket Notes"])
 def note_get(
     ticket_id: int,
     db: Session = Depends(get_db),
-    _=Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
+    user: User = Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
 ):
-    return get_notes(ticket_id=ticket_id, db=db)
+    return get_notes(ticket_id=ticket_id, db=db, user=user)
 
 
 @ticket_notes.post("/", response_model=TicketNoteDetails)

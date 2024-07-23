@@ -6,7 +6,8 @@ from src.models.user import User
 from src.schemas.ticket_notes import TicketNoteCreate
 
 
-def get_notes(ticket_id: int, db: Session):
+def get_notes(ticket_id: int, db: Session, user: User):
+    ticket = db.query
     notes = (
         db.query(TicketNote)
         .filter(TicketNote.ticket_id == ticket_id)
@@ -21,6 +22,7 @@ def create_note(note: TicketNoteCreate, db: Session, user: User):
         db.query(Ticket)
         .filter(
             Ticket.id == note.ticket_id,
+            Ticket.user_id == str(user.id),
             Ticket.status not in ["Completed", "Cancelled", "Rejected"],
         )
         .first()
