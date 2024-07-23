@@ -7,9 +7,9 @@ app = my_app()
 @app.get("/", response_class=HTMLResponse)
 def home():
     content = """
-    <h1>TicketSystem - API</h1>
+    <h1>Ticketing System</h1>
     <ul>
-    <li><h3><a href="/docs">API Documentation</a></h3></li>
+    <li><h2><a href="/docs">API Documentation</a></h2></li>
     </ul>
     """
     return content

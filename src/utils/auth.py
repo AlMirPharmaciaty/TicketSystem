@@ -1,19 +1,18 @@
+import os
 from datetime import datetime
 from datetime import timedelta
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
 from ..models.user import User
-from ..utils.encryption import verify
-from ..utils.database import get_db
+from .encryption import verify
+from .database import get_db
 
-auth = APIRouter(prefix="/auth", tags=["Auth"])
-
-SECRET_KEY = "ansoifnafo8ahwfnasnuiauhyh89rhuioashfuwaghf"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login/")
 
 
@@ -78,3 +77,18 @@ def get_current_user(
     if user is None:
         raise credentials_exception
     return user
+
+
+class RoleChecker:
+    """
+    If the user has any role from the allowed roles
+    return true or else raise an exception
+    """
+
+    def __init__(self, allowed_roles):
+        self.allowed_roles = allowed_roles
+
+    def __call__(self, user: User = Depends(get_current_user)):
+        if any(role in user.roles for role in self.allowed_roles):
+            return user
+        raise HTTPException(status_code=401, detail="You don't have enough permissions")

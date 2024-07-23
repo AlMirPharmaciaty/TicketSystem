@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from ..utils.database import get_db
-from ..schemas.user import UserDetails, UserUpdate
-from ..controllers.user import update_user, delete_user, get_user
+from ..schemas.user import UserDetails, UserUpdate, UserRolesUpdate
+from ..controllers.user import update_user, delete_user, get_user, manage_user_roles
 from ..models.user import User
-from ..controllers.auth import get_current_user
+from ..utils.auth import get_current_user, RoleChecker
 
 users = APIRouter(prefix="/user", tags=["User"])
 
@@ -32,3 +32,13 @@ def user_update(
 @users.delete("/", response_model=UserDetails)
 def user_delete(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     return delete_user(db=db, user_id=user.id)
+
+
+@users.post("/roles/", response_model=UserDetails)
+def user_role_manager(
+    user_id: int,
+    roles: UserRolesUpdate,
+    db: Session = Depends(get_db),
+    _=Depends(RoleChecker(allowed_roles=["Admin"])),
+):
+    return manage_user_roles(db=db, user_id=user_id, roles=roles)

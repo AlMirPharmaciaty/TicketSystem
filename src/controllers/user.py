@@ -29,8 +29,7 @@ def create_user(db: Session, user: UserCreate):
         raise HTTPException(
             status_code=400, detail="Please contact support to reactivate your account."
         )
-
-    user = User(**user.model_dump())
+    user = User(**user.model_dump(), roles=["Customer"])
     user.password = encrypt(user.password)
     db.add(user)
     db.commit()
@@ -65,3 +64,7 @@ def delete_user(db: Session, user_id: int):
     user.deleted = True
     db.commit()
     return user
+
+
+def manage_user_roles(db: Session, user_id: int, roles: list[str]):
+    pass
