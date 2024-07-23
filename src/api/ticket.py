@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from src.controllers.ticket import create_ticket, get_user_tickets, get_all_tickets
-from src.schemas.ticket import TicketCreate, TicketDetails, TicketOrder
+from src.controllers.ticket import create_ticket, get_user_tickets, get_all_tickets, update_ticket_status
+from src.schemas.ticket import TicketCreate, TicketDetails, TicketOrder, TicketUpdate
 from src.models.user import User
 from src.utils.database import get_db
 from src.utils.auth import RoleChecker
@@ -41,8 +41,17 @@ async def ticket_get_all(
     limit: int = 10,
     order: TicketOrder = TicketOrder.LAT,
     db: Session = Depends(get_db),
-    _: User = Depends(RoleChecker(allowed_roles=["Customer"])),
+    _: User = Depends(RoleChecker(allowed_roles=["Customer"]))
 ):
     return get_all_tickets(
         db=db, user_id=user_id, status=status, skip=skip, limit=limit, order=order
     )
+
+@tickets.put("/", response_model=TicketDetails)
+async def ticket_status_update(
+    ticket_id: int,
+    status: TicketStatus | None = None,
+    db: Session = Depends(get_db),
+    _: User = Depends(RoleChecker(allowed_roles=["Customer"]))
+):
+    return update_ticket_status(status=status, ticket_id=ticket_id, db=db)

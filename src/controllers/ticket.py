@@ -55,3 +55,9 @@ def get_all_tickets(
         query = query.order_by(Ticket.created_at.desc())
     tickets = query.offset(skip).limit(limit).all()
     return tickets
+
+def update_ticket_status(status: TicketStatus, ticket_id: int, db:Session):
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+    ticket.status = status
+    db.commit()
+    return ticket

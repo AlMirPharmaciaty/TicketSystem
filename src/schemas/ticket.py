@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from datetime import datetime
 from enum import Enum
-
+from src.schemas.ticket_status import TicketStatus
 
 class TicketBase(BaseModel):
     title: str
@@ -19,6 +19,11 @@ class TicketDetails(TicketBase):
 class TicketCreate(TicketBase):
     pass
 
+class TicketUpdate(BaseModel):
+    status: TicketStatus
+
+class TicketCreate(TicketBase):
+    pass
 
 class TicketOrder(str, Enum):
     OLD = "Oldest"
