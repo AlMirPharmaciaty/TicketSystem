@@ -21,13 +21,16 @@ async def ticket_create(
 
 @tickets.get("/", response_model=list[TicketDetails])
 async def ticket_get_my(
-    db: Session = Depends(get_db),
-    user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
+    status: TicketStatus | None = None,
     skip: int = 0,
     limit: int = 10,
     order: TicketOrder = TicketOrder.LAT,
+    db: Session = Depends(get_db),
+    user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
 ):
-    return get_user_tickets(db=db, user=user)
+    return get_user_tickets(
+        db=db, user=user, status=status, skip=skip, limit=limit, order=order
+    )
 
 
 @tickets.get("/all", response_model=list[TicketDetails])

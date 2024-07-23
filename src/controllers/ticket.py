@@ -20,11 +20,14 @@ def create_ticket(db: Session, ticket: TicketCreate, user: User):
 def get_user_tickets(
     db: Session,
     user: User,
+    status: TicketStatus | None = None,
     skip: int = 0,
     limit: int = 10,
     order: TicketOrder = TicketOrder.LAT,
 ):
     query = db.query(Ticket).filter(Ticket.user_id == str(user.id))
+    if status:
+        query = query.filter(Ticket.status == status)
     if order.name == "OLD":
         query = query.order_by(Ticket.created_at.asc())
     else:
