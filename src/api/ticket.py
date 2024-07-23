@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from src.controllers.ticket import create_ticket, get_user_tickets, get_all_tickets, update_ticket_status
-from src.schemas.ticket import TicketCreate, TicketDetails, TicketOrder, TicketUpdate
+from src.schemas.ticket import TicketCreate, TicketDetails, TicketOrder
 from src.models.user import User
 from src.utils.database import get_db
 from src.utils.auth import RoleChecker
