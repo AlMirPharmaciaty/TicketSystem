@@ -1,19 +1,17 @@
 from sqlalchemy.orm import Session
-from src.schemas import ticket as ticket_schema
-from src.models import ticket as ticket_model 
-from src.models import user as user_model
+from src.schemas.ticket import TicketCreate
+from src.models.ticket import Ticket
+from src.models.user import User
 from src.schemas.ticket_status import TicketStatus
-from datetime import datetime
 
-def create_ticket(db: Session, ticket: ticket_schema.TicketCreate, user: user_model.User):
-    new_ticket = ticket_model.Ticket(
-        title = ticket.title,
-        description = ticket.description,
-        status = "New",
-        user_id = user.id,
-        username = user.username
+
+def create_ticket(db: Session, ticket: TicketCreate, user: User):
+    ticket = Ticket(
+        **ticket.model_dump(),
+        status=TicketStatus.NEW,
+        user_id=user.id,
+        username=user.username,
     )
-
-    db.add(new_ticket)
+    db.add(ticket)
     db.commit()
-    return new_ticket
+    return ticket
