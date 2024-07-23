@@ -66,4 +66,11 @@ def update_ticket_status(status: TicketStatus, ticket_id: int, db:Session):
     ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     ticket.status = status
     db.commit()
+<<<<<<< Updated upstream
+=======
+    return ticket
+
+def get_ticket_history(ticket_id: int, db:Session):
+    ticket = db.query(TicketHistory).filter(TicketHistory.ticket_id == ticket_id).order_by(TicketHistory.created_at.desc()).all()
+>>>>>>> Stashed changes
     return ticket
