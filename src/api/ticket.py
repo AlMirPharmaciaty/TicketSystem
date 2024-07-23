@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from src.controllers.ticket import (
     create_ticket,
-    get_tickets,
+    get_my_tickets,
     update_ticket_status,
     get_ticket_history,
 )
@@ -19,19 +19,38 @@ tickets = APIRouter(prefix="/tickets", tags=["Tickets"])
 
 
 @tickets.get("/", response_model=list[TicketDetails])
-async def ticket_get(
+async def ticket_get_my(
+    status: TicketStatus | None = None,
+    skip: int = 0,
+    limit: int = 10,
+    order: TicketOrder = TicketOrder.LAT,
+    db: Session = Depends(get_db),
+    user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
+):
+    return get_my_tickets(
+        db=db,
+        user=user,
+        status=status,
+        skip=skip,
+        limit=limit,
+        order=order,
+    )
+
+
+@tickets.get("/all/", response_model=list[TicketDetails])
+async def ticket_get_all(
     user_id: str | None = None,
     status: TicketStatus | None = None,
     skip: int = 0,
     limit: int = 10,
     order: TicketOrder = TicketOrder.LAT,
     db: Session = Depends(get_db),
-    user: User = Depends(RoleChecker(allowed_roles=["Pharmacist", "Customer"])),
+    user: User = Depends(RoleChecker(allowed_roles=["Pharmacist"])),
 ):
-    return get_tickets(
+    return get_my_tickets(
         db=db,
-        user_id=user_id,
         user=user,
+        user=user_id,
         status=status,
         skip=skip,
         limit=limit,
