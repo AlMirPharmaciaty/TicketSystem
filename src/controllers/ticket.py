@@ -19,8 +19,23 @@ def create_ticket(db: Session, ticket: ticket_schema.TicketCreate, user: user_mo
     db.commit()
     return new_ticket
 
+<<<<<<< Updated upstream
 def get_tickets_user(db: Session, user: user_model.User):
     query = db.query(ticket_model.Ticket).filter(ticket_model.Ticket.username == user.username).all()
     if query == []:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Tickets Raised")
     return query
+=======
+
+def get_user_tickets(db: Session, user: User):
+    query = db.query(Ticket).filter(Ticket.user_id == str(user.user_id)).all()
+    return query
+
+def get_tickets(db: Session, user: User, user_id: str | None = None, status: TicketStatus | None = None):
+    query = db.query(Ticket)
+    if user_id:
+        query = query.filter(Ticket.user_id == user_id)
+    if status:
+        query = query.filter(Ticket.status == status)
+    return query.all()
+>>>>>>> Stashed changes
