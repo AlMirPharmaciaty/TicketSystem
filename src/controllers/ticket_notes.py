@@ -6,8 +6,19 @@ from src.models.user import User
 from src.schemas.ticket_notes import TicketNoteCreate
 
 
-def get_notes(ticket_id: int, db: Session, user: User):
-    ticket = db.query
+def get_notes(ticket_id: int, db: Session, user: User | None):
+    if user:
+        ticket = (
+            db.query(Ticket)
+            .filter(Ticket.id == ticket_id, Ticket.user_id == str(user.id))
+            .first()
+        )
+
+        if not ticket:
+            raise HTTPException(
+                status_code=401, detail="You can only see your tickets' notes."
+            )
+
     notes = (
         db.query(TicketNote)
         .filter(TicketNote.ticket_id == ticket_id)

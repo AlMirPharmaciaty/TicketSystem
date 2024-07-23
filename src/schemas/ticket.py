@@ -19,9 +19,6 @@ class TicketDetails(TicketBase):
 class TicketCreate(TicketBase):
     pass
 
-class TicketUpdate(BaseModel):
-    status: TicketStatus
-
 class TicketCreate(TicketBase):
     pass
 
