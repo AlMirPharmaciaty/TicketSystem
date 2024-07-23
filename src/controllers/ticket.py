@@ -1,3 +1,4 @@
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from src.schemas.ticket import TicketCreate
 from src.models.ticket import Ticket
@@ -15,3 +16,8 @@ def create_ticket(db: Session, ticket: TicketCreate, user: User):
     db.add(ticket)
     db.commit()
     return ticket
+
+
+def get_user_tickets(db: Session, user: User):
+    query = db.query(Ticket).filter(Ticket.user_id == user.user_id).all()
+    return query
