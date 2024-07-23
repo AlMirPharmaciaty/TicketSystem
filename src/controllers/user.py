@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from ..models.user import User
 from ..utils.encryption import encrypt
-from ..schemas.user import UserCreate, UserUpdate
+from ..schemas.user import UserCreate, UserUpdate, UserRolesUpdate
 from sqlalchemy import func
 
 
@@ -29,7 +29,7 @@ def create_user(db: Session, user: UserCreate):
         raise HTTPException(
             status_code=400, detail="Please contact support to reactivate your account."
         )
-    user = User(**user.model_dump(), roles=["Customer"])
+    user = User(**user.model_dump())
     user.password = encrypt(user.password)
     db.add(user)
     db.commit()
@@ -66,5 +66,11 @@ def delete_user(db: Session, user_id: int):
     return user
 
 
-def manage_user_roles(db: Session, user_id: int, roles: list[str]):
-    pass
+def manage_user_roles(db: Session, user_id: int, roles: UserRolesUpdate):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=500, detail="User not found.")
+
+    user.roles = roles.roles
+    db.commit()
+    return user
