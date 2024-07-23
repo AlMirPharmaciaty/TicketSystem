@@ -14,16 +14,17 @@ def create_ticket(db: Session, ticket: TicketCreate, user: User):
         user_id=user.id,
         username=user.username,
     )
+    db.add(ticket)
+    db.commit()
+    db.refresh(ticket)
     history = TicketHistory(
         ticket_id=ticket.id,
         user_id=user.id,
         username=user.username,
         status=ticket.status,
     )
-    db.add(ticket)
     db.add(history)
     db.commit()
-    db.refresh(ticket)
     return ticket
 
 
