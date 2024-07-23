@@ -10,6 +10,11 @@ from src.schemas.user import UserDetails, UserCreate
 auth = APIRouter(prefix="/auth", tags=["Auth"])
 
 
+@auth.post("/register/", response_model=UserDetails)
+def register(user: UserCreate, db: Session = Depends(get_db)):
+    return create_user(db=db, user=user)
+
+
 @auth.post("/login/", response_model=Token)
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
@@ -24,8 +29,3 @@ def login(
         raise HTTPException(status_code=401, detail="Invalid credentials")
     access_token = create_access_token(data={"sub": user.email})
     return Token(access_token=access_token, token_type="bearer")
-
-
-@auth.post("/register/", response_model=UserDetails)
-def register(user: UserCreate, db: Session = Depends(get_db)):
-    return create_user(db=db, user=user)

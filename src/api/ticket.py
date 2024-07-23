@@ -47,22 +47,8 @@ async def ticket_status_update(
     ticket_id: int,
     status: TicketStatus,
     db: Session = Depends(get_db),
-    _: User = Depends(RoleChecker(allowed_roles=["Pharmacist"])),
+    user : User = Depends(RoleChecker(allowed_roles=["Pharmacist"])),
 ):
-<<<<<<< Updated upstream
-    return update_ticket_status(status=status, ticket_id=ticket_id, db=db)
-=======
+
     return update_ticket_status(status=status, ticket_id=ticket_id, db=db, user=user)
 
->>>>>>> Stashed changes
-
-@tickets.history("/history", response_model = TicketDetails)
-async def ticket_history(
-    ticket_id: int,
-    db: Session = Depends(get_db)
-):
-<<<<<<< Updated upstream
-    return get_ticket_history()
-=======
-    return get_ticket_history(ticket_id=ticket_id, db=db)
->>>>>>> Stashed changes
