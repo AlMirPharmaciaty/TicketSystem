@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from src.controllers.ticket import create_ticket, get_user_tickets, get_all_tickets, update_ticket_status
+from src.controllers.ticket import create_ticket, get_all_tickets, update_ticket_status
 from src.schemas.ticket import TicketCreate, TicketDetails, TicketOrder, TicketUpdate
 from src.models.user import User
 from src.utils.database import get_db
@@ -19,18 +19,18 @@ async def ticket_create(
     return create_ticket(ticket=ticket, user=user, db=db)
 
 
-@tickets.get("/", response_model=list[TicketDetails])
-async def ticket_get_my(
-    status: TicketStatus | None = None,
-    skip: int = 0,
-    limit: int = 10,
-    order: TicketOrder = TicketOrder.LAT,
-    db: Session = Depends(get_db),
-    user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
-):
-    return get_user_tickets(
-        db=db, user=user, status=status, skip=skip, limit=limit, order=order
-    )
+# @tickets.get("/", response_model=list[TicketDetails])
+# async def ticket_get_my(
+#     status: TicketStatus | None = None,
+#     skip: int = 0,
+#     limit: int = 10,
+#     order: TicketOrder = TicketOrder.LAT,
+#     db: Session = Depends(get_db),
+#     user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
+# ):
+#     return get_user_tickets(
+#         db=db, user=user, status=status, skip=skip, limit=limit, order=order
+#     )
 
 
 @tickets.get("/all", response_model=list[TicketDetails])
@@ -41,10 +41,10 @@ async def ticket_get_all(
     limit: int = 10,
     order: TicketOrder = TicketOrder.LAT,
     db: Session = Depends(get_db),
-    _: User = Depends(RoleChecker(allowed_roles=["Customer"]))
+    user: User = Depends(RoleChecker(allowed_roles=["Pharmacist", "Customer"]))
 ):
     return get_all_tickets(
-        db=db, user_id=user_id, status=status, skip=skip, limit=limit, order=order
+        db=db, user_id=user_id, user=user, status=status, skip=skip, limit=limit, order=order
     )
 
 @tickets.put("/", response_model=TicketDetails)
