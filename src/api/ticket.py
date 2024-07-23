@@ -47,6 +47,6 @@ async def ticket_status_update(
     ticket_id: int,
     status: TicketStatus,
     db: Session = Depends(get_db),
-    _: User = Depends(RoleChecker(allowed_roles=["Pharmacist"])),
+    user: User = Depends(RoleChecker(allowed_roles=["Pharmacist"])),
 ):
-    return update_ticket_status(status=status, ticket_id=ticket_id, db=db)
+    return update_ticket_status(status=status, ticket_id=ticket_id, db=db, user=user)
