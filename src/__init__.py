@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from .utils.database import init_db
-from .api import auth, user
+from src.utils.database import init_db
+from src.api import auth, user, ticket_notes
 
 
 def my_app():
@@ -13,5 +13,6 @@ def my_app():
     app = FastAPI(title=os.getenv("TITLE"))
     app.include_router(auth.auth)
     app.include_router(user.users)
+    app.include_router(ticket_notes.ticket_notes)
 
     return app

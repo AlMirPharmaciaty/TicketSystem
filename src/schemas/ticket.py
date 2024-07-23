@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-
-from src.schemas.ticketStatus import TicketStatus
+from src.schemas.ticket_status import TicketStatus
 
 class Ticket(BaseModel):
     id: int

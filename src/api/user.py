@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from ..utils.database import get_db
-from ..schemas.user import UserDetails, UserUpdate, UserRolesUpdate
-from ..controllers.user import update_user, delete_user, get_user, manage_user_roles
-from ..models.user import User
-from ..utils.auth import get_current_user, RoleChecker
+from src.utils.database import get_db
+from src.schemas.user import UserDetails, UserUpdate, UserRolesUpdate
+from src.controllers.user import update_user, delete_user, get_user, manage_user_roles
+from src.models.user import User
+from src.utils.auth import get_current_user, RoleChecker
 
 users = APIRouter(prefix="/user", tags=["User"])
 

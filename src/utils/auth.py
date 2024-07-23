@@ -6,9 +6,9 @@ from fastapi.security import OAuth2PasswordBearer
 import jwt
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
-from ..models.user import User
-from .encryption import verify
-from .database import get_db
+from src.models.user import User
+from src.utils.encryption import verify
+from src.utils.database import get_db
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")

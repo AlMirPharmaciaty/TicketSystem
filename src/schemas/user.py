@@ -10,8 +10,7 @@ class UserDetails(UserBase):
     username: str
     email: str
     deleted: bool
-    roles: list[str]
-
+    roles: list[str] | list[None]
 
 class UserCreate(UserBase):
     username: str = Field(min_length=4, max_length=16)
