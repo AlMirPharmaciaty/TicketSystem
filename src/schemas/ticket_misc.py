@@ -8,3 +8,8 @@ class TicketStatus(str, Enum):
     COM = "Completed"
     CAN = "Cancelled"
     REJ = "Rejected"
+
+
+class TicketOrder(str, Enum):
+    OLD = "Oldest"
+    LAT = "Latest"

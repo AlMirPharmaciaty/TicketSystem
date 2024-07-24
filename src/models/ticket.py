@@ -10,7 +10,6 @@ class BaseTicket(Base):
     created_at = Column(DateTime, default=func.now())
     user_id = Column(String, nullable=False)
     username = Column(String, nullable=False)
-    status = Column(String, nullable=False, default="New")
 
 
 class Ticket(BaseTicket):
@@ -18,12 +17,14 @@ class Ticket(BaseTicket):
 
     title = Column(String, nullable=False)
     description = Column(Text, nullable=False)
+    status = Column(String, nullable=False, default="New")
 
 
 class TicketHistory(BaseTicket):
     __tablename__ = "ticketHistory"
 
     ticket_id = Column(Integer, ForeignKey("tickets.id"), nullable=False)
+    status = Column(String, nullable=False)
 
 
 class TicketNote(BaseTicket):
