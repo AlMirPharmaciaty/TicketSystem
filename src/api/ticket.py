@@ -27,7 +27,7 @@ async def ticket_get(
     response = APIResponse()
 
     try:
-        if (user_id and "Pharmacist" in user.roles) or "Pharmacist" in user.roles:
+        if "Pharmacist" in user.roles:
             user_id = user_id
         else:
             user_id = str(user.id)
