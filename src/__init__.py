@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from src.utils.database import init_db
 from src.api import auth, user, ticket, ticket_notes
@@ -10,8 +9,6 @@ def my_app():
     Loading environment variables
     and initializing the app
     """
-
-    load_dotenv()
     init_db()
 
     app = FastAPI(title=os.getenv("TITLE"))
