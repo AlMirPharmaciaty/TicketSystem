@@ -4,4 +4,4 @@ sqlalchemy
 psycopg2
 PyJWT
 alembic
-python-dotenv
+pydantic-settings

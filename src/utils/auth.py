@@ -6,14 +6,16 @@ import jwt
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
 
+from src.utils.settings import Settings
 from src.utils.database import get_db
 from src.utils.encryption import verify
 from src.models.user import User
 from src.controllers.user import UserController
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+settings = Settings()
+SECRET_KEY = settings.SECRET_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login/")
 
 

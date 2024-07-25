@@ -1,7 +1,3 @@
-from dotenv import load_dotenv
-
-load_dotenv()
-
 from fastapi.responses import HTMLResponse
 from src import my_app
 
