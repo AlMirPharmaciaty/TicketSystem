@@ -27,11 +27,7 @@ async def ticket_get(
     response = APIResponse()
 
     try:
-        if "Pharmacist" in user.roles:
-            user_id = user_id
-        else:
-            user_id = str(user.id)
-
+        user_id = user_id if "Pharmacist" in user.roles else str(user.id)
         controller = TicketController(db=db)
         data = controller.get_tickets(
             user_id=user_id,
