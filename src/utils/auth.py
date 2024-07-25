@@ -27,8 +27,7 @@ def authenticate_user(email: str, password: str, db: Session):
     user = controller.get_user(email=email)
     if not user:
         return False
-    else:
-        user = user[0]
+    user = user[0]
     if not verify(password, user.password):
         return False
     return user

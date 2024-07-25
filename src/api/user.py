@@ -44,7 +44,7 @@ def users_get_all(
 
 @users.put("/", response_model=APIResponse)
 def user_update(
-    user_update: UserUpdate,
+    new_details: UserUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -56,16 +56,16 @@ def user_update(
         if not user:
             raise Exception("User not found.")
 
-        if user_update.email:
+        if new_details.email:
             duplicate_email = (
                 db.query(User)
-                .filter(User.id != current_user.id, User.email == user_update.email)
+                .filter(User.id != current_user.id, User.email == new_details.email)
                 .first()
             )
             if duplicate_email:
                 raise Exception("Email already exists.")
 
-        data = controller.update_user(user=user[0], user_update=user_update)
+        data = controller.update_user(user=user[0], new_details=new_details)
         response.data = jsonable_encoder([data])
         response.status = "status"
 

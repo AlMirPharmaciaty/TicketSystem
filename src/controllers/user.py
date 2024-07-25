@@ -34,14 +34,14 @@ class UserController:
         self.db.refresh(user)
         return user
 
-    def update_user(self, user: User, user_update: UserUpdate):
-        if user_update.username:
-            user.username = user_update.username
-        if user_update.email:
-            user.email = user_update.email
-        if user_update.password:
-            if user.password != user_update.password:
-                user.password = encrypt(user_update.password)
+    def update_user(self, user: User, new_details: UserUpdate):
+        if new_details.username:
+            user.username = new_details.username
+        if new_details.email:
+            user.email = new_details.email
+        if new_details.password:
+            if user.password != new_details.password:
+                user.password = encrypt(new_details.password)
         self.db.commit()
         self.db.refresh(user)
         return user
