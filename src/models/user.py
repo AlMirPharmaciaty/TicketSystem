@@ -15,4 +15,4 @@ class User(Base):
     created_at = Column(DateTime, default=func.now())
     modified_at = Column(DateTime, default=func.now(), onupdate=func.now())
     deleted = Column(Boolean, default=False)
-    roles = Column(ARRAY(String))
+    roles = Column(String)

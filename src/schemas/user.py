@@ -18,4 +18,4 @@ class UserUpdate(UserBase):
 
 
 class UserRolesUpdate(UserBase):
-    roles: list[str] | list[None] = list[None]
+    roles: str

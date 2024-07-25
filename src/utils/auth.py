@@ -86,6 +86,7 @@ class RoleChecker:
         self.allowed_roles = allowed_roles
 
     def __call__(self, user: User = Depends(get_current_user)):
-        if any(role in user.roles for role in self.allowed_roles):
+        user_roles = user.roles.split(",")
+        if any(role in user_roles for role in self.allowed_roles):
             return user
         raise HTTPException(status_code=401, detail="You don't have enough permissions")

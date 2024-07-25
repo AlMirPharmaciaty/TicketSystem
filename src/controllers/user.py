@@ -27,7 +27,7 @@ class UserController:
         return users.offset(skip).limit(limit).all()
 
     def create_user(self, user: UserCreate):
-        user = User(**user.model_dump(), roles=[])
+        user = User(**user.model_dump(), roles="")
         user.password = encrypt(user.password)
         self.db.add(user)
         self.db.commit()
