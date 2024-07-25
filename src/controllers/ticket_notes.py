@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
+
 from src.models.ticket import TicketNote
 from src.models.user import User
-from src.schemas.ticket_notes import TicketNoteCreate
+from src.schemas.ticket import TicketNoteCreate
 
 
 class TicketNotesController:

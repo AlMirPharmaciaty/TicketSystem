@@ -1,27 +1,20 @@
 import os
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.orm import Session
-from src.models.user import User
-from src.utils.encryption import verify
+
 from src.utils.database import get_db
+from src.utils.encryption import verify
+from src.models.user import User
+from src.controllers.user import UserController
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login/")
-
-
-def get_user(email: str, db: Session):
-    """
-    Function to get the active user from db by email
-    """
-    user = db.query(User).filter(User.email == email, User.deleted == False).first()
-    return user
 
 
 def authenticate_user(email: str, password: str, db: Session):
@@ -30,9 +23,12 @@ def authenticate_user(email: str, password: str, db: Session):
     the given password is verified using md5 encryption
     see utils/encryption
     """
-    user = get_user(email=email, db=db)
+    controller = UserController(db=db)
+    user = controller.get_user(email=email)
     if not user:
         return False
+    else:
+        user = user[0]
     if not verify(password, user.password):
         return False
     return user
@@ -46,17 +42,16 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
         - by a secret key using HS256 algorithm
     """
     to_encode = data.copy()
+    expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     if expires_delta:
         expire = datetime.now() + expires_delta
-    else:
-        expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
 ):
     """
     Function to get active user
@@ -69,14 +64,15 @@ def get_current_user(
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_email: str = payload.get("sub")
-        if user_email is None:
+        if not user_email:
             raise credentials_exception
     except InvalidTokenError as e:
         raise credentials_exception from e
-    user = get_user(email=user_email, db=db)
-    if user is None:
+    controller = UserController(db=db)
+    user = controller.get_user(email=user_email)
+    if not user:
         raise credentials_exception
-    return user
+    return user[0]
 
 
 class RoleChecker:

@@ -1,9 +1,8 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from src.schemas.ticket import TicketCreate
+
+from src.schemas.ticket import TicketCreate, TicketStatus, TicketOrder
 from src.models.ticket import Ticket, TicketHistory
 from src.models.user import User
-from src.schemas.ticket_misc import TicketStatus, TicketOrder
 
 
 class TicketController:
@@ -20,6 +19,7 @@ class TicketController:
         )
         self.db.add(history)
         self.db.commit()
+        self.db.refresh(ticket)
 
     def get_tickets(
         self,
@@ -28,7 +28,7 @@ class TicketController:
         status: TicketStatus | None = None,
         skip: int = 0,
         limit: int = 10,
-        order: TicketOrder = TicketOrder.LAT,
+        order: TicketOrder = TicketOrder.NEW,
     ):
         tickets = self.db.query(Ticket)
         if user_id:
@@ -51,7 +51,6 @@ class TicketController:
         )
         self.db.add(ticket)
         self.update_ticket_history(ticket=ticket, user=user)
-        self.db.refresh(ticket)
         return ticket
 
     def update_ticket_status(self, status: TicketStatus, ticket: Ticket, user: User):

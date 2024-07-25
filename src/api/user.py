@@ -1,45 +1,121 @@
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+
 from src.utils.database import get_db
-from src.schemas.user import UserDetails, UserUpdate, UserRolesUpdate
-from src.controllers.user import update_user, delete_user, get_user, manage_user_roles
-from src.models.user import User
 from src.utils.auth import get_current_user, RoleChecker
+from src.models.user import User
+from src.schemas.api_response import APIResponse
+from src.schemas.user import UserUpdate, UserRolesUpdate
+from src.controllers.user import UserController
 
 users = APIRouter(prefix="/user", tags=["User"])
 
 
-@users.get("/", response_model=list[UserDetails])
+@users.get("/", response_model=APIResponse)
 def users_get_all(
     db: Session = Depends(get_db),
     user_id: int = None,
     username: str = None,
+    email: str = None,
     skip: int = 0,
     limit: int = 10,
     _=Depends(RoleChecker(allowed_roles=["Pharmacist", "Admin"])),
 ):
-    return get_user(db=db, user_id=user_id, username=username, skip=skip, limit=limit)
+    response = APIResponse()
+    try:
+        controller = UserController(db=db)
+        data = controller.get_user(
+            user_id=user_id,
+            username=username,
+            email=email,
+            skip=skip,
+            limit=limit,
+        )
+        response.data = jsonable_encoder(data)
+        response.status = "status"
+
+    except Exception as e:
+        response.status = "error"
+        response.message = e.args[0]
+
+    return response
 
 
-@users.put("/", response_model=UserDetails)
+@users.put("/", response_model=APIResponse)
 def user_update(
-    user: UserUpdate,
+    user_update: UserUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return update_user(db=db, user=user, user_id=current_user.id)
+    response = APIResponse()
+    try:
+        controller = UserController(db=db)
+        user = controller.get_user(user_id=current_user.id)
+
+        if not user:
+            raise Exception("User not found.")
+
+        if user_update.email:
+            duplicate_email = (
+                db.query(User)
+                .filter(User.id != current_user.id, User.email == user_update.email)
+                .first()
+            )
+            if duplicate_email:
+                raise Exception("Email already exists.")
+
+        data = controller.update_user(user=user[0], user_update=user_update)
+        response.data = jsonable_encoder([data])
+        response.status = "status"
+
+    except Exception as e:
+        response.status = "error"
+        response.message = e.args[0]
+
+    return response
 
 
-@users.delete("/", response_model=UserDetails)
+@users.delete("/", response_model=APIResponse)
 def user_delete(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    return delete_user(db=db, user_id=user.id)
+    response = APIResponse()
+    try:
+        controller = UserController(db=db)
+        user = controller.get_user(user_id=user.id)
+        if not user:
+            raise Exception("User not found.")
+
+        data = controller.delete_user(user=user[0])
+        response.data = jsonable_encoder([data])
+        response.status = "status"
+
+    except Exception as e:
+        response.status = "error"
+        response.message = e.args[0]
+
+    return response
 
 
-@users.post("/roles/", response_model=UserDetails)
+@users.post("/roles/", response_model=APIResponse)
 def user_role_manager(
     user_id: int,
     roles: UserRolesUpdate,
     db: Session = Depends(get_db),
     _=Depends(RoleChecker(allowed_roles=["Admin"])),
 ):
-    return manage_user_roles(db=db, user_id=user_id, roles=roles)
+    response = APIResponse()
+    try:
+        controller = UserController(db=db)
+        user = controller.get_user(user_id=user_id)
+        if not user:
+            raise Exception("User not found.")
+
+        data = controller.manage_user_roles(user=user[0], roles=roles)
+        response.data = jsonable_encoder([data])
+        response.status = "success"
+
+    except Exception as e:
+        response.status = "error"
+        response.message = e.args[0]
+
+    return response

@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+
 from src.utils.database import get_db
-from src.controllers.ticket_notes import TicketNotesController
-from src.schemas.ticket_notes import TicketNoteCreate
+from src.utils.auth import RoleChecker
 from src.models.ticket import Ticket
 from src.models.user import User
-from src.utils.auth import RoleChecker
 from src.schemas.api_response import APIResponse
-from fastapi.encoders import jsonable_encoder
+from src.schemas.ticket import TicketNoteCreate
+from src.controllers.ticket_notes import TicketNotesController
 
 ticket_notes = APIRouter(prefix="/notes", tags=["Ticket Notes"])
 

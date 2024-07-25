@@ -6,6 +6,10 @@ from src.api import auth, user, ticket, ticket_notes
 
 
 def my_app():
+    """
+    Loading environment variables
+    and initializing the app
+    """
 
     load_dotenv()
     init_db()
