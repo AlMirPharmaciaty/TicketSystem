@@ -58,6 +58,7 @@ def note_create(
         note_controller = TicketNotesController(db=db)
         data = note_controller.create_note(note=note, user=user)
         response.data = jsonable_encoder([data])
+        response.status = "success"
 
     except Exception as e:
         response.status = "error"
