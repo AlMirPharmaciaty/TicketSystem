@@ -21,8 +21,12 @@ async def ticket_get(
     limit: int = 10,
     order: TicketOrder = TicketOrder.NEW,
     db: Session = Depends(get_db),
-    user: User = Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
+    user: User = Depends(RoleChecker(
+        allowed_roles=["Customer", "Pharmacist"])),
 ):
+    """
+    API to get a list of tickets by the given optional paramters
+    """
     response = APIResponse()
 
     try:
@@ -82,7 +86,9 @@ async def ticket_status_update(
         if not ticket:
             raise Exception("Ticket not found.")
         ticket = ticket[0]
-        data = controller.update_ticket_status(status=status, ticket=ticket, user=user)
+        data = controller.update_ticket_status(status=status,
+                                               ticket=ticket,
+                                               user=user)
         response.data = jsonable_encoder([data])
         response.status = "success"
 
@@ -97,7 +103,8 @@ async def ticket_status_update(
 async def ticket_history(
     ticket_id: int,
     db: Session = Depends(get_db),
-    user: User = Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
+    user: User = Depends(RoleChecker(
+        allowed_roles=["Customer", "Pharmacist"])),
 ):
     response = APIResponse()
     try:
@@ -107,7 +114,8 @@ async def ticket_history(
         if not ticket:
             raise Exception("Ticket not found.")
         ticket = ticket[0]
-        response.data = jsonable_encoder(controller.get_ticket_history(ticket=ticket))
+        response.data = jsonable_encoder(
+            controller.get_ticket_history(ticket=ticket))
         response.status = "success"
 
     except Exception as e:

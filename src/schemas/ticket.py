@@ -1,15 +1,15 @@
 from enum import Enum
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class TicketCreate(BaseModel):
-    title: str
-    description: str
+    title: str = Field(min_length=4)
+    description: str = Field(min_length=4)
 
 
 class TicketNoteCreate(BaseModel):
     ticket_id: int
-    note: str
+    note: str = Field(min_length=4)
 
 
 class TicketStatus(str, Enum):

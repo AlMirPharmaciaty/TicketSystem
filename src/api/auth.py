@@ -16,6 +16,9 @@ auth = APIRouter(prefix="/auth", tags=["Auth"])
 
 @auth.post("/register/", response_model=APIResponse)
 def register(user: UserCreate, db: Session = Depends(get_db)):
+    """
+    API for users to create a new account
+    """
     response = APIResponse()
 
     try:
@@ -37,12 +40,13 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
 
 @auth.post("/login/", response_model=Token)
 def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
 ):
     """
-    Endpoint to let users log into the system
+    API to let users log into the system
     they are first authenticated by username and password
-    if verified, a token is created and sent to them
+    if verified, a JWT token is created and sent to them
     """
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
