@@ -14,39 +14,7 @@ tickets = APIRouter(prefix="/tickets", tags=["Tickets"])
 
 
 @tickets.get("/", response_model=APIResponse)
-async def ticket_get_my(
-    ticket_id: int | None = None,
-    status: TicketStatus | None = None,
-    skip: int = 0,
-    limit: int = 10,
-    order: TicketOrder = TicketOrder.NEW,
-    db: Session = Depends(get_db),
-    user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
-):
-    response = APIResponse()
-
-    try:
-        controller = TicketController(db=db)
-        data = controller.get_tickets(
-            user_id=user.id,
-            ticket_id=ticket_id,
-            status=status,
-            skip=skip,
-            limit=limit,
-            order=order,
-        )
-        response.data = jsonable_encoder(data)
-        response.status = "success"
-
-    except Exception as e:
-        response.status = "error"
-        response.message = e.args[0]
-
-    return response
-
-
-@tickets.get("/all/", response_model=APIResponse)
-async def ticket_get_all(
+async def ticket_get(
     ticket_id: int | None = None,
     user_id: str | None = None,
     status: TicketStatus | None = None,
@@ -54,11 +22,16 @@ async def ticket_get_all(
     limit: int = 10,
     order: TicketOrder = TicketOrder.NEW,
     db: Session = Depends(get_db),
-    _: User = Depends(RoleChecker(allowed_roles=["Pharmacist"])),
+    user: User = Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
 ):
     response = APIResponse()
 
     try:
+        if (user_id and "Pharmacist" in user.roles) or "Pharmacist" in user.roles:
+            user_id = user_id
+        else:
+            user_id = str(user.id)
+
         controller = TicketController(db=db)
         data = controller.get_tickets(
             user_id=user_id,
@@ -109,11 +82,11 @@ async def ticket_status_update(
     response = APIResponse()
 
     try:
-        ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+        controller = TicketController(db=db)
+        ticket = controller.get_tickets(ticket_id=ticket_id)
         if not ticket:
             raise Exception("Ticket not found.")
-
-        controller = TicketController(db=db)
+        ticket = ticket[0]
         data = controller.update_ticket_status(status=status, ticket=ticket, user=user)
         response.data = jsonable_encoder([data])
         response.status = "success"
@@ -134,14 +107,12 @@ async def ticket_history(
     response = APIResponse()
 
     try:
-        ticket = db.query(Ticket).filter(Ticket.id == ticket_id)
-        if "Pharmacist" not in user.roles:
-            ticket = ticket.filter(Ticket.user_id == str(user.id))
-        ticket = ticket.first()
+        controller = TicketController(db=db)
+        user_id = None if "Pharmacist" not in user.roles else str(user.id)
+        ticket = controller.get_tickets(ticket_id=ticket_id, user_id=user_id)
         if not ticket:
             raise Exception("Ticket not found.")
-
-        controller = TicketController(db=db)
+        ticket = ticket[0]
         response.data = jsonable_encoder(controller.get_ticket_history(ticket=ticket))
         response.status = "success"
 
