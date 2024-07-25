@@ -4,7 +4,6 @@ from sqlalchemy.orm import Session
 
 from src.utils.database import get_db
 from src.utils.auth import RoleChecker
-from src.models.ticket import Ticket
 from src.models.user import User
 from src.schemas.api_response import APIResponse
 from src.schemas.ticket import TicketCreate, TicketStatus, TicketOrder
@@ -27,7 +26,7 @@ async def ticket_get(
     response = APIResponse()
 
     try:
-        user_id = user_id if "Pharmacist" in user.roles else str(user.id)
+        user_id = user_id if "Pharmacist" in user.roles else user.id
         controller = TicketController(db=db)
         data = controller.get_tickets(
             user_id=user_id,
@@ -101,10 +100,9 @@ async def ticket_history(
     user: User = Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
 ):
     response = APIResponse()
-
     try:
         controller = TicketController(db=db)
-        user_id = None if "Pharmacist" not in user.roles else str(user.id)
+        user_id = None if "Pharmacist" in user.roles else user.id
         ticket = controller.get_tickets(ticket_id=ticket_id, user_id=user_id)
         if not ticket:
             raise Exception("Ticket not found.")

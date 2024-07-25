@@ -4,10 +4,10 @@ from sqlalchemy.orm import Session
 
 from src.utils.database import get_db
 from src.utils.auth import RoleChecker
-from src.models.ticket import Ticket
 from src.models.user import User
 from src.schemas.api_response import APIResponse
 from src.schemas.ticket import TicketNoteCreate
+from src.controllers.ticket import TicketController
 from src.controllers.ticket_notes import TicketNotesController
 
 ticket_notes = APIRouter(prefix="/notes", tags=["Ticket Notes"])
@@ -22,22 +22,14 @@ def note_get(
     response = APIResponse()
 
     try:
-        # Get ticket by Id
-        ticket = db.query(Ticket).filter(Ticket.id == ticket_id)
-        # Check if user is not a Pharmacist
-        if "Pharmacist" not in user.roles:
-            # Restrict to tickets created by the user
-            ticket = ticket.filter(Ticket.user_id == str(user.id))
-        ticket = ticket.first()
-
-        # Raise an exception if ticket not found
+        ticket_controller = TicketController(db=db)
+        user_id = None if "Pharmacist" in user.roles else user.id
+        ticket = ticket_controller.get_tickets(ticket_id=ticket_id, user_id=user_id)
         if not ticket:
             raise Exception("Ticket not found.")
 
-        # Pass the ticket id to the controller
-        # to get list of notes based on ticket id
-        controller = TicketNotesController(db=db)
-        response.data = jsonable_encoder(controller.get_notes(ticket_id=ticket_id))
+        note_controller = TicketNotesController(db=db)
+        response.data = jsonable_encoder(note_controller.get_notes(ticket_id=ticket_id))
         response.status = "success"
     except Exception as e:
         response.status = "error"
@@ -55,25 +47,16 @@ def note_create(
     response = APIResponse()
 
     try:
-        # Get ticket by Id
-        ticket = db.query(Ticket).filter(Ticket.id == note.ticket_id)
-        # check if ticket is still open
-        ticket = ticket.filter(
-            Ticket.status not in ["Completed", "Cancelled", "Rejected"]
+        ticket_controller = TicketController(db=db)
+        user_id = None if "Pharmacist" in user.roles else user.id
+        ticket = ticket_controller.get_tickets(
+            ticket_id=note.ticket_id, user_id=user_id
         )
-        # Check if user is not a Pharmacist
-        if "Pharmacist" not in user.roles:
-            # Restrict to tickets created by the user
-            ticket = ticket.filter(Ticket.user_id == str(user.id))
-        ticket = ticket.first()
-        # Raise and exception if ticket not found
         if not ticket:
             raise Exception("Ticket not found.")
 
-        # Pass the data to the controller
-        # to add a new note to the ticket
-        controller = TicketNotesController(db=db)
-        data = controller.create_note(note=note, user=user)
+        note_controller = TicketNotesController(db=db)
+        data = note_controller.create_note(note=note, user=user)
         response.data = jsonable_encoder([data])
 
     except Exception as e:
