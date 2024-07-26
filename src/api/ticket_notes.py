@@ -11,25 +11,27 @@ from src.controllers.ticket import TicketController
 from src.controllers.ticket_notes import TicketNotesController
 
 ticket_notes = APIRouter(prefix="/notes", tags=["Ticket Notes"])
+response = APIResponse()
 
 
 @ticket_notes.get("/", response_model=APIResponse)
 def note_get(
     ticket_id: int,
     db: Session = Depends(get_db),
-    user: User = Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
+    user: User = Depends(RoleChecker(
+        allowed_roles=["Customer", "Pharmacist"])),
 ):
-    response = APIResponse()
-
     try:
         ticket_controller = TicketController(db=db)
         user_id = None if "Pharmacist" in user.roles else user.id
-        ticket = ticket_controller.get_tickets(ticket_id=ticket_id, user_id=user_id)
+        ticket = ticket_controller.get_tickets(
+            ticket_id=ticket_id, user_id=user_id)
         if not ticket:
             raise Exception("Ticket not found.")
 
         note_controller = TicketNotesController(db=db)
-        response.data = jsonable_encoder(note_controller.get_notes(ticket_id=ticket_id))
+        response.data = jsonable_encoder(
+            note_controller.get_notes(ticket_id=ticket_id))
         response.status = "success"
     except Exception as e:
         response.status = "error"
@@ -42,16 +44,16 @@ def note_get(
 def note_create(
     note: TicketNoteCreate,
     db: Session = Depends(get_db),
-    user: User = Depends(RoleChecker(allowed_roles=["Customer", "Pharmacist"])),
+    user: User = Depends(RoleChecker(
+        allowed_roles=["Customer", "Pharmacist"])),
 ):
-    response = APIResponse()
-
     try:
         ticket_controller = TicketController(db=db)
         user_id = None if "Pharmacist" in user.roles else user.id
         ticket = ticket_controller.get_tickets(
             ticket_id=note.ticket_id, user_id=user_id
         )
+        print(jsonable_encoder(ticket))
         if not ticket:
             raise Exception("Ticket not found.")
 

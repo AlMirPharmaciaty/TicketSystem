@@ -10,6 +10,7 @@ from src.schemas.ticket import TicketCreate, TicketStatus, TicketOrder
 from src.controllers.ticket import TicketController
 
 tickets = APIRouter(prefix="/tickets", tags=["Tickets"])
+response = APIResponse()
 
 
 @tickets.get("/", response_model=APIResponse)
@@ -27,7 +28,6 @@ async def ticket_get(
     """
     API to get a list of tickets by the given optional paramters
     """
-    response = APIResponse()
 
     try:
         user_id = user_id if "Pharmacist" in user.roles else user.id
@@ -56,7 +56,6 @@ async def ticket_create(
     db: Session = Depends(get_db),
     user: User = Depends(RoleChecker(allowed_roles=["Customer"])),
 ):
-    response = APIResponse()
 
     try:
         controller = TicketController(db=db)
@@ -78,7 +77,6 @@ async def ticket_status_update(
     db: Session = Depends(get_db),
     user: User = Depends(RoleChecker(allowed_roles=["Pharmacist"])),
 ):
-    response = APIResponse()
 
     try:
         controller = TicketController(db=db)
@@ -106,7 +104,7 @@ async def ticket_history(
     user: User = Depends(RoleChecker(
         allowed_roles=["Customer", "Pharmacist"])),
 ):
-    response = APIResponse()
+
     try:
         controller = TicketController(db=db)
         user_id = None if "Pharmacist" in user.roles else user.id
@@ -114,8 +112,8 @@ async def ticket_history(
         if not ticket:
             raise Exception("Ticket not found.")
         ticket = ticket[0]
-        response.data = jsonable_encoder(
-            controller.get_ticket_history(ticket=ticket))
+        data = controller.get_ticket_history(ticket=ticket)
+        response.data = jsonable_encoder(data)
         response.status = "success"
 
     except Exception as e:

@@ -10,6 +10,7 @@ from src.schemas.user import UserUpdate, UserRolesUpdate
 from src.controllers.user import UserController
 
 users = APIRouter(prefix="/user", tags=["User"])
+response = APIResponse()
 
 
 @users.get("/", response_model=APIResponse)
@@ -22,7 +23,7 @@ def users_get_all(
     limit: int = 10,
     _=Depends(RoleChecker(allowed_roles=["Pharmacist", "Admin"])),
 ):
-    response = APIResponse()
+
     try:
         controller = UserController(db=db)
         data = controller.get_user(
@@ -48,7 +49,7 @@ def user_update(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    response = APIResponse()
+
     try:
         controller = UserController(db=db)
         user = controller.get_user(user_id=current_user.id)
@@ -59,7 +60,8 @@ def user_update(
         if new_details.email:
             duplicate_email = (
                 db.query(User)
-                .filter(User.id != current_user.id, User.email == new_details.email)
+                .filter(User.id != current_user.id,
+                        User.email == new_details.email)
                 .first()
             )
             if duplicate_email:
@@ -77,8 +79,9 @@ def user_update(
 
 
 @users.delete("/", response_model=APIResponse)
-def user_delete(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    response = APIResponse()
+def user_delete(db: Session = Depends(get_db),
+                user: User = Depends(get_current_user)):
+
     try:
         controller = UserController(db=db)
         user = controller.get_user(user_id=user.id)
@@ -103,7 +106,7 @@ def user_role_manager(
     db: Session = Depends(get_db),
     _=Depends(RoleChecker(allowed_roles=["Admin"])),
 ):
-    response = APIResponse()
+
     try:
         controller = UserController(db=db)
         user = controller.get_user(user_id=user_id)

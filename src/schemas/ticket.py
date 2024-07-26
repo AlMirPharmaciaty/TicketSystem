@@ -8,7 +8,7 @@ class TicketCreate(BaseModel):
 
 
 class TicketNoteCreate(BaseModel):
-    ticket_id: int
+    ticket_id: int = Field(gt=0)
     note: str = Field(min_length=4)
 
 
